@@ -34,7 +34,7 @@ def normal_cdf(x: float, mu: float = 0, sigma: float = 1) -> float:
     """
     Calculate the cumulative distribution function (CDF) of the normal distribution.
     CDF gives the probability that the random variable takes on a value less than or equal to a given value.
-    For instance, if you're looking at the CDF of a fair six-sided die roll, 
+    For instance, if you're looking at the CDF of a fair six-sided die roll,
     the value of the CDF at 3 would tell you the probability of rolling a number less than or equal to 3.
 
     Args:
@@ -137,11 +137,13 @@ def plot_cdf_example():
     plt.show()
 
 
+assert 0.3988 < normal_pdf(0) < 0.3990
 assert 0.84 < normal_cdf(1) < 0.85
 assert 0.99 < inverse_normal_cdf(normal_cdf(1)) < 1.01
 
 if __name__ == "__main__":
-    plot_pdf_example()
-    plot_cdf_example()
+    # plot_pdf_example()
+    # plot_cdf_example()
+    print(normal_pdf(0))  # returns 0.3989
     print(normal_cdf(1))  # returns 0.8413447460685429
     print(inverse_normal_cdf(0.8413447460685429))  # should return 1
