@@ -69,6 +69,13 @@ def normal_two_sided_bound(probability, mu, sigma) -> Tuple[float, float]:
     return lower, upper
 
 
+def two_sided_p_value(x: float, mu: float = 0, sigma: float = 1) -> float:
+    if x < mu:  # x is lower than mean
+        return 2 * normal_proba_below(x, mu, sigma)
+    else:  # x is higher than mean
+        return 2 * normal_proba_above(x, mu, sigma)
+
+
 if __name__ == "__main__":
 
     def by_stats():
@@ -79,6 +86,10 @@ if __name__ == "__main__":
         alpha = 0.05
         lower, upper = normal_two_sided_bound(alpha, mu_0, sigma_0)
 
+        # say we observe 530 head. the p-value is
+        x = 529.5
+        p_value = two_sided_p_value(x, mu_0, sigma_0)
+
         print("======================== With statistics ========================")
         print(
             f"If coin is fair, X should have (around) mean {mu_0} and SD {sigma_0: .1f}"
@@ -87,9 +98,12 @@ if __name__ == "__main__":
         print(
             "Assuming h0 is true, there is 5% chance we observe X outside this bound."
         )
+        print(f"With 530 head, the p-value is {p_value}")
+        # say we observe 530 head. the p-value is
+        x = 529.5
 
     def by_permutation():
-        print("======================== With permutation  ========================")
+        print("======================== With permutation ========================")
         # say we do the coin flip 1000x
         mu_0, sigma_0 = normal_approximation_to_binomial(1000, 0.5)
         print(
@@ -105,6 +119,10 @@ if __name__ == "__main__":
             )  # number of head taken from 1000x
             n_heads.append(n_head)
 
+        # say we observe 530 head. the p-value is
+        x = 529.5
+        p_value = np.mean([n > x for n in n_heads]) * 2
+
         alpha = 0.05
         lower = np.percentile(n_heads, (alpha * 100 / 2))
         upper = np.percentile(n_heads, (100 - (alpha * 100 / 2)))
@@ -112,6 +130,7 @@ if __name__ == "__main__":
         print(
             "Assuming h0 is true, there is 5% chance we observe X outside this bound."
         )
+        print(f"With 530 head, the p-value is {p_value}")
 
     print("\n")
     by_stats()
