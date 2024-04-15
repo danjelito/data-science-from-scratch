@@ -59,33 +59,19 @@ def normal_cdf(x: float, mu: float = 0, sigma: float = 1) -> float:
 def inverse_normal_cdf(
     p: float, mu: float = 0, sigma: float = 1, tolerance: float = 0.00001
 ) -> float:
-    """
-    Find approximate value corresponding to specific probability using binary search.
-
-    Args:
-    - p (float): The desired probability value.
-    - mu (float, optional): The mean of the normal distribution (default is 0).
-    - sigma (float, optional): The standard deviation of the normal distribution (default is 1).
-    - tolerance (float, optional): The desired accuracy of the result (default is 0.00001).
-
-    Returns:
-    float: The value of x that corresponds to the given probability.
-
-    Example:
-    inverse_normal_cdf(0.5)  # With default mu=0 and sigma=1
-    0.0
-    inverse_normal_cdf(0.84134, mu=3, sigma=2)  # mu=3, sigma=2
-    3.00005
-    """
     low_z = -10.0  # normal_cdf(-10) is very close to 0
     high_z = 10.0  # normal_cdf(10) is very close to 1
     while high_z - low_z > tolerance:
         mid_z = (low_z + high_z) / 2  # consider midpoint value
-        mid_p = normal_cdf(mid_z, mu, sigma)  # get the probability of that midpoint
+        mid_p = normal_cdf(mid_z, mu=0, sigma=1)  # get the probability of that midpoint
         if p < mid_p:
             high_z = mid_z  # desired p < resulted p, search below the mid_z
-        elif p > mid_p:
+        elif p >= mid_p:
             low_z = mid_z  # desired p > resulted p, search above mid_z
+
+    # if not standard, rescale
+    if mu != 0 or sigma != 1:
+        return mu + sigma * mid_z
     return mid_z
 
 
@@ -140,6 +126,7 @@ def plot_cdf_example():
 assert 0.3988 < normal_pdf(0) < 0.3990
 assert 0.84 < normal_cdf(1) < 0.85
 assert 0.99 < inverse_normal_cdf(normal_cdf(1)) < 1.01
+assert 492 < inverse_normal_cdf(p=0.3, mu=500, sigma=14.8) < 493
 
 if __name__ == "__main__":
     # plot_pdf_example()
