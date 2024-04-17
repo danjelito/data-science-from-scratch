@@ -1,5 +1,5 @@
 from typing import Tuple
-import proba
+import proba as proba
 import math
 import random
 import numpy as np
@@ -35,32 +35,95 @@ def normal_approximation_to_binomial(n: int, p: float):
 normal_proba_below = proba.normal_cdf
 
 
-# proba that var is above threshold
 def normal_proba_above(x: float, mu: float = 0, sigma: float = 1):
+    """
+    Calculate the probability that a variable is above a given threshold.
+
+    Args:
+        x (float): The threshold value.
+        mu (float, optional): The mean of the normal distribution. Defaults to 0.
+        sigma (float, optional): The standard deviation of the normal distribution. Defaults to 1.
+
+    Returns:
+        float: The probability that the variable is above the threshold.
+    """
     return 1 - proba.normal_cdf(x, mu, sigma)
 
 
-# proba that var is between a low and high value
 def normal_proba_between(lo: float, hi: float, mu: float = 0, sigma: float = 1):
-    return normal_proba_above(hi, mu, sigma) - normal_proba_below(hi, mu, sigma)
+    """
+    Calculate the probability that a variable is between two thresholds.
+
+    Args:
+        lo (float): The lower threshold value.
+        hi (float): The upper threshold value.
+        mu (float, optional): The mean of the normal distribution. Defaults to 0.
+        sigma (float, optional): The standard deviation of the normal distribution. Defaults to 1.
+
+    Returns:
+        float: The probability that the variable is between the two thresholds.
+    """
+    return normal_proba_above(hi, mu, sigma) - normal_proba_above(lo, mu, sigma)
 
 
-# proba that var is outside a low and high value
 def normal_proba_outside(lo: float, hi: float, mu: float = 0, sigma: float = 1):
+    """
+    Calculate the probability that a variable is outside two thresholds.
+
+    Args:
+        lo (float): The lower threshold value.
+        hi (float): The upper threshold value.
+        mu (float, optional): The mean of the normal distribution. Defaults to 0.
+        sigma (float, optional): The standard deviation of the normal distribution. Defaults to 1.
+
+    Returns:
+        float: The probability that the variable is outside the two thresholds.
+    """
     return 1 - normal_proba_between(lo, hi, mu, sigma)
 
 
 def normal_upper_bound(probability, mu, sigma) -> float:
-    """Returns the z for which P(Z <= z)"""
+    """
+    Returns the z for which P(Z <= z) given a probability.
+
+    Args:
+        probability (float): The probability value.
+        mu (float): The mean of the normal distribution.
+        sigma (float): The standard deviation of the normal distribution.
+
+    Returns:
+        float: The upper bound z-value.
+    """
     return proba.inverse_normal_cdf(probability, mu, sigma)
 
 
 def normal_lower_bound(probability, mu, sigma) -> float:
-    """Returns the z for which P(Z >= z)"""
+    """
+    Returns the z for which P(Z >= z) given a probability.
+
+    Args:
+        probability (float): The probability value.
+        mu (float): The mean of the normal distribution.
+        sigma (float): The standard deviation of the normal distribution.
+
+    Returns:
+        float: The lower bound z-value.
+    """
     return proba.inverse_normal_cdf((1 - probability), mu, sigma)
 
 
 def normal_two_sided_bound(probability, mu, sigma) -> Tuple[float, float]:
+    """
+    Returns the lower and upper bounds for a two-sided test given a probability.
+
+    Args:
+        probability (float): The probability value.
+        mu (float): The mean of the normal distribution.
+        sigma (float): The standard deviation of the normal distribution.
+
+    Returns:
+        Tuple[float, float]: The lower and upper bound z-values.
+    """
     tail_probability = probability / 2
     # upper bound should have proba above it
     upper = normal_lower_bound(tail_probability, mu, sigma)
@@ -70,6 +133,17 @@ def normal_two_sided_bound(probability, mu, sigma) -> Tuple[float, float]:
 
 
 def two_sided_p_value(x: float, mu: float = 0, sigma: float = 1) -> float:
+    """
+    Calculate the two-sided p-value given a test statistic.
+
+    Args:
+        x (float): The test statistic.
+        mu (float, optional): The mean of the normal distribution. Defaults to 0.
+        sigma (float, optional): The standard deviation of the normal distribution. Defaults to 1.
+
+    Returns:
+        float: The two-sided p-value.
+    """
     if x < mu:  # x is lower than mean
         return 2 * normal_proba_below(x, mu, sigma)
     else:  # x is higher than mean
