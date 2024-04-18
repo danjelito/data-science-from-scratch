@@ -1,6 +1,9 @@
 from typing import Callable
 from linealg import Vector
 import linealg
+import random
+
+random.seed(0)
 
 
 def difference_quotient(f: Callable[[float], float], x: float, h: float = 0.00001):
@@ -54,6 +57,7 @@ def estimate_gradient(f: Callable[[Vector], float], v: Vector, h: float = 0.0000
 
 
 def assertion():
+
     def square(x: int | float):
         return x * x
 
@@ -102,3 +106,27 @@ if __name__ == "__main__":
     print(
         f"The slope of {f} at {sample_v} is {[round(x, 6) for x in derivative_arbitrary_function]}"
     )
+
+    # ---------------------------------------------------------------------
+    # using gradient, let's find a point where sum_of_squares function has the smallest output
+    def sum_of_squares_gradient(v: Vector) -> Vector:
+        return [2 * v_i for v_i in v]
+
+    def gradient_step(v: Vector, gradient: Vector, step_size: float) -> Vector:
+        """Move step_size in the direction of gradient direction from v"""
+        assert len(v) == len(gradient), "v and gradient must be of the same size."
+        step = linealg.scalar_multiply(step_size, gradient)
+        return linealg.add(v, step)
+
+    # pick a random starting point
+    v = [random.uniform(-10, 10) for _ in range(3)]
+    epochs = 1000
+    # step size should be negative because we are moving away from the increase
+    # play around with this to see the effect of step size
+    step_size = -0.005
+    for epoch in range(epochs):
+        gradient = sum_of_squares_gradient(v)
+        v = gradient_step(v, gradient, step_size)
+        if epoch % 100 == 0:
+            print(f"Epoch {epoch}, v = {v}")
+    print(f"Distance to [0, 0, 0] == {linealg.distance(v, [0, 0, 0]): .8f}")
