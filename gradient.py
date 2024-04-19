@@ -2,6 +2,7 @@ from typing import Callable
 from linealg import Vector
 import linealg
 import random
+import matplotlib.pyplot as plt
 
 random.seed(0)
 
@@ -130,3 +131,79 @@ if __name__ == "__main__":
         if epoch % 100 == 0:
             print(f"Epoch {epoch}, v = {v}")
     print(f"Distance to [0, 0, 0] == {linealg.distance(v, [0, 0, 0]): .8f}")
+
+    # ---------------------------------------------------------------------
+    # using gradient, let's fit a model
+    def f(x) -> tuple:
+        return x, 20 * x + 5
+
+    inputs = [f(x) for x in range(-50, 50)]  # [(x1, y1), (x2, y2), ...]
+    # print(inputs)
+    # plt.scatter(x=[x for (x, y) in inputs], y=[y for (x, y) in inputs])
+    # plt.show()
+
+    def linear_gradient(x: float, y: float, theta: Vector):
+
+        def calculate_error(y_true, y_pred):
+            """Calculates error of the prediction."""
+            return y_true - y_pred
+
+        def calculate_squared_error(y_true, y_pred):
+            """Calculates squared error of the prediction."""
+            return calculate_error(y_true, y_pred) ** 2
+
+        def calculate_squared_error_derivative(x, error):
+            """
+            Partial derivative of squared error
+            with respect to slope and intercept.
+            """
+            # return [der loss to slope, der loss to intercept]
+            return [2 * error * x, 2 * error]
+
+        slope, intercept = theta
+        predicted = slope * x + intercept # create prediction using linear eq
+        error = calculate_error(predicted, y)
+        squared_error = calculate_squared_error(predicted, y)
+        gradient = calculate_squared_error_derivative(x, error)
+        return gradient
+
+    # start with random theta
+    theta = [random.uniform(-1, 1) for _ in range(2)]
+    learning_rate = 0.001
+    epochs = 5_000
+    for epoch in range(epochs):
+        # compute the mean of gradients accross all data points
+        gradients = linealg.vector_mean([linear_gradient(x, y, theta) for (x, y) in inputs])
+        # take a step in the opposite direction
+        theta = gradient_step(theta, gradients, - learning_rate)
+        # print log
+        if (epoch % 1000 == 0) or (epoch == epochs - 1):
+            print(f"Epoch {epoch}, (slope, intercept) = {theta}")
+
+    slope, intercept = theta
+    assert 19.9 < slope < 20.1, "Slope should be around 20."
+    assert 4.9 < intercept < 5.1, "Intercept should be around 5."
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
