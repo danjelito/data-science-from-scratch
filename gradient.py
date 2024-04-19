@@ -171,6 +171,7 @@ if __name__ == "__main__":
     theta = [random.uniform(-1, 1) for _ in range(2)]
     learning_rate = 0.001
     epochs = 5_000
+    print("\nTraining model.")
     for epoch in range(epochs):
         # compute the mean of gradients accross all data points
         gradients = linealg.vector_mean([linear_gradient(x, y, theta) for (x, y) in inputs])
@@ -184,8 +185,42 @@ if __name__ == "__main__":
     assert 19.9 < slope < 20.1, "Slope should be around 20."
     assert 4.9 < intercept < 5.1, "Intercept should be around 5."
 
+    # ---------------------------------------------------------------------
+    # using gradient, let's fit a model with minibatch
+    from typing import TypeVar, List, Iterator
+    T = TypeVar("T") # returned type is the same as input type
 
+    def minibatches(dataset: List[T], batch_size: int, shuffle: bool= True) -> Iterator[List[T]]:
+        batch_starts = [start for start in range(0, len(dataset), batch_size)]
+        if shuffle:
+            # shuffle dataset
+            random.shuffle(dataset)
+        for start in batch_starts:
+            end = start + batch_size
+            yield dataset[start:end]
 
+    # start with random theta
+    theta = [random.uniform(-1, 1) for _ in range(2)]
+    learning_rate = 0.001
+    epochs = 1000
+    batch_size = 10
+
+    print("\nTraining model with minibatches.")
+    for epoch in range(epochs):
+        # if the generator is defined above then it will run ou
+        # therefore we need to define it here
+        for batch in minibatches(inputs, batch_size, False):
+            # compute the mean of gradients
+            gradients = linealg.vector_mean([linear_gradient(x, y, theta) for (x, y) in batch])
+            # take a step in the opposite direction
+            theta = gradient_step(theta, gradients, - learning_rate)
+        # print log
+        if (epoch % 1000 == 0) or (epoch == epochs - 1):
+            print(f"Epoch {epoch}, (slope, intercept) = {theta}")
+
+    slope, intercept = theta
+    assert 19.9 < slope < 20.1, "Slope should be around 20."
+    assert 4.9 < intercept < 5.1, "Intercept should be around 5."
 
 
 
