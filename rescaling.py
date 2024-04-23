@@ -27,7 +27,6 @@ def rescale(data: List[Vector]) -> List[Vector]:
     return rescaled_data
 
 
-
 data = [[-3, -1, 1], [-1, 0, 1], [1, 1, 1]]
 print(rescale(data))
 means, stds = calculate_mean_std(rescale(data))
