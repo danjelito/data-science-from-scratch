@@ -1,7 +1,9 @@
+from typing import List
+
 import matplotlib.pyplot as plt
 from sklearn.datasets import make_regression
+
 import linealg
-from typing import List
 from linealg import Vector
 
 
@@ -84,18 +86,23 @@ def remove_projection(data: List[Vector], w: Vector) -> List[Vector]:
     return [remove_projection_from_vector(v, w) for v in data]
 
 
+# from scratch
 direction_guess = first_principal_component(inputs, 100, 0.1)
-inputs_projected = remove_projection(inputs, direction_guess)
+inputs_projected_scratch = remove_projection(inputs, direction_guess)
 
 
 # see the data
-plt.scatter([x for (x, y) in inputs], [y for (x, y) in inputs])
-plt.scatter([x for (x, y) in inputs_projected], [y for (x, y) in inputs_projected], color="blue")
-plt.arrow(
-    0,
-    0,
-    direction_guess[0] * 100,
-    direction_guess[1] * 100,
-    color="red",
-)
-plt.show()
+# plt.scatter([x for (x, y) in inputs], [y for (x, y) in inputs])
+# plt.scatter(
+#     [x for (x, y) in inputs_projected_scratch],
+#     [y for (x, y) in inputs_projected_scratch],
+#     color="blue",
+# )
+# plt.arrow(
+#     0,
+#     0,
+#     direction_guess[0] * 100,
+#     direction_guess[1] * 100,
+#     color="red",
+# )
+# plt.show()
