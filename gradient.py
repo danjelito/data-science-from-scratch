@@ -76,6 +76,13 @@ def assertion():
 assertion()
 
 
+def gradient_step(v: Vector, gradient: Vector, step_size: float) -> Vector:
+    """Move step_size in the direction of gradient direction from v"""
+    assert len(v) == len(gradient), "v and gradient must be of the same size."
+    step = linealg.scalar_multiply(step_size, gradient)
+    return linealg.add(v, step)
+
+
 if __name__ == "__main__":
 
     # ---------------------------------------------------------------------
@@ -161,7 +168,7 @@ if __name__ == "__main__":
             return [2 * error * x, 2 * error]
 
         slope, intercept = theta
-        predicted = slope * x + intercept # create prediction using linear eq
+        predicted = slope * x + intercept  # create prediction using linear eq
         error = calculate_error(predicted, y)
         squared_error = calculate_squared_error(predicted, y)
         gradient = calculate_squared_error_derivative(x, error)
@@ -174,9 +181,11 @@ if __name__ == "__main__":
     print("\nTraining model.")
     for epoch in range(epochs):
         # compute the mean of gradients accross all data points
-        gradients = linealg.vector_mean([linear_gradient(x, y, theta) for (x, y) in inputs])
+        gradients = linealg.vector_mean(
+            [linear_gradient(x, y, theta) for (x, y) in inputs]
+        )
         # take a step in the opposite direction
-        theta = gradient_step(theta, gradients, - learning_rate)
+        theta = gradient_step(theta, gradients, -learning_rate)
         # print log
         if (epoch % 1000 == 0) or (epoch == epochs - 1):
             print(f"Epoch {epoch}, (slope, intercept) = {theta}")
@@ -188,9 +197,12 @@ if __name__ == "__main__":
     # ---------------------------------------------------------------------
     # using gradient, let's fit a model with minibatch
     from typing import TypeVar, List, Iterator
-    T = TypeVar("T") # returned type is the same as input type
 
-    def minibatches(dataset: List[T], batch_size: int, shuffle: bool= True) -> Iterator[List[T]]:
+    T = TypeVar("T")  # returned type is the same as input type
+
+    def minibatches(
+        dataset: List[T], batch_size: int, shuffle: bool = True
+    ) -> Iterator[List[T]]:
         batch_starts = [start for start in range(0, len(dataset), batch_size)]
         if shuffle:
             # shuffle dataset
@@ -211,9 +223,11 @@ if __name__ == "__main__":
         # therefore we need to define it here
         for batch in minibatches(inputs, batch_size, False):
             # compute the mean of gradients
-            gradients = linealg.vector_mean([linear_gradient(x, y, theta) for (x, y) in batch])
+            gradients = linealg.vector_mean(
+                [linear_gradient(x, y, theta) for (x, y) in batch]
+            )
             # take a step in the opposite direction
-            theta = gradient_step(theta, gradients, - learning_rate)
+            theta = gradient_step(theta, gradients, -learning_rate)
         # print log
         if (epoch % 1000 == 0) or (epoch == epochs - 1):
             print(f"Epoch {epoch}, (slope, intercept) = {theta}")
@@ -221,24 +235,3 @@ if __name__ == "__main__":
     slope, intercept = theta
     assert 19.9 < slope < 20.1, "Slope should be around 20."
     assert 4.9 < intercept < 5.1, "Intercept should be around 5."
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

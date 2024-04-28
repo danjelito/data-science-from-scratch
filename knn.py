@@ -35,8 +35,8 @@ def knn_classify(k: int, labeled_points: LabeledPoint, new_point: Vector) -> str
     by_distance = sorted(
         labeled_points, key=lambda lp: linealg.distance(lp.point, new_point)
     )
-    # find the labels for k closest
     k_nearest = [lp.label for lp in by_distance[:k]]
+    # find the labels for k closest
     # and let them vote
     return majority_vote(k_nearest)
 
